@@ -44,6 +44,9 @@ async function run (){
 
         const partCollection = client.db('manufacturer-website').collection('parts');
 
+
+        const userCollection = client.db('bike_parts').collection('users'); 
+        
 app.get('/part',async(req, res)=>{
   const query = {};
   const cursor = partCollection.find(query);
