@@ -46,7 +46,7 @@ async function run (){
 
 
         const userCollection = client.db('bike_parts').collection('users'); 
-        
+
 app.get('/part',async(req, res)=>{
   const query = {};
   const cursor = partCollection.find(query);
@@ -68,6 +68,27 @@ app.get('/part/:id',async(req,res)=>{
   const part = await partCollection.findOne(query);
   res.send(part);
 
+});
+
+app.post('/booking', async (req, res) => {
+  const booking = req.body;
+  const result = await bookingCollection.insertOne(booking);
+  res.send(result);
+});
+
+
+
+app.get('/booking', verifyJWT, async (req, res) => {
+  const email = req.query.email;
+  const decodedEmail = req.decoded.email;
+  if (email === decodedEmail) {
+      const query = { email: email };
+      const bookings = await bookingCollection.find(query).toArray();
+      return res.send(bookings);
+  }
+  else {
+      return res.status(403).send({ message: 'forbidden access' });
+  }
 });
 
 app.get('/user', verifyJWT, async (req, res) => {
