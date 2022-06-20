@@ -1,12 +1,31 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const app = express();
 const port = process.env.PORT || 8080;
 
- 
+function verifyJWT(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+      return res.status(401).send({ message: 'UnAuthorized access' });
+  }
+  const token = authHeader.split(' ')[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+      if (err) {
+          return res.status(403).send({ message: 'Forbidden access' })
+      }
+      req.decoded = decoded;
+      next();
+  });
+}
+
+
+
+
 // middleware
 app.use(cors());
 app.use(express.json());
@@ -32,6 +51,14 @@ app.get('/part',async(req, res)=>{
   res.send(parts) ;
 });
 
+app.get('/part',async(req, res)=>{
+  const newPart = req.body;
+  const result = await partCollection.insertOne(newPart);
+  res.send(result) ;
+});
+
+
+
 app.get('/part/:id',async(req,res)=>{
   const id = req.params.id;
   const query ={_id:ObjectId(id)};
@@ -39,7 +66,6 @@ app.get('/part/:id',async(req,res)=>{
   res.send(part);
 
 });
-
 
 
     
