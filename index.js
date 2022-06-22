@@ -76,6 +76,13 @@ app.get('/part/:id',async(req,res)=>{
 
 });
 
+// bookings post
+app.post('/booking', async (req, res) => {
+  const booking = req.body;
+  const result = await bookingCollection.insertOne(booking);
+  res.send(result);
+});
+
 
 
 // users
