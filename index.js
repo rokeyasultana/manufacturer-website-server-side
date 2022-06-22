@@ -83,7 +83,19 @@ app.post('/booking', async (req, res) => {
   res.send(result);
 });
 
-
+// bookings get
+app.get('/booking', verifyJWT, async (req, res) => {
+  const email = req.query.email;
+  const decodedEmail = req.decoded.email;
+  if (email === decodedEmail) {
+      const query = { email: email };
+      const bookings = await bookingCollection.find(query).toArray();
+      return res.send(bookings);
+  }
+  else {
+      return res.status(403).send({ message: 'forbidden access' });
+  }
+});
 
 // users
 app.get('/user',  async (req, res) => {
