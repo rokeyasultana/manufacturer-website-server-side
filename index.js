@@ -2,26 +2,13 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-const jwt = require('jsonwebtoken');
+
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const app = express();
 const port = process.env.PORT || 8080;
 
-function verifyJWT(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-      return res.status(401).send({ message: 'UnAuthorized access' });
-  }
-  const token = authHeader.split(' ')[1];
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
-      if (err) {
-          return res.status(403).send({ message: 'Forbidden access' })
-      }
-      req.decoded = decoded;
-      next();
-  });
-}
+
 
 
 
@@ -45,10 +32,10 @@ async function run (){
         const partCollection = client.db('manufacturer-website').collection('parts');
 
 
-        const userCollection = client.db('bike_parts').collection('users'); 
+        const userCollection = client.db('manufacturer-website').collection('users'); 
 
-        const bookingCollection = client.db('bike_parts').collection('bookings');
-        
+        const bookingCollection = client.db('manufacturer-website').collection('bookings');
+
 app.get('/part',async(req, res)=>{
   const query = {};
   const cursor = partCollection.find(query);
@@ -80,20 +67,8 @@ app.post('/booking', async (req, res) => {
 
 
 
-app.get('/booking', verifyJWT, async (req, res) => {
-  const email = req.query.email;
-  const decodedEmail = req.decoded.email;
-  if (email === decodedEmail) {
-      const query = { email: email };
-      const bookings = await bookingCollection.find(query).toArray();
-      return res.send(bookings);
-  }
-  else {
-      return res.status(403).send({ message: 'forbidden access' });
-  }
-});
 
-app.get('/user', verifyJWT, async (req, res) => {
+app.get('/user',  async (req, res) => {
   const users = await userCollection.find().toArray();
   res.send(users);
 });
