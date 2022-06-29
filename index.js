@@ -48,7 +48,7 @@ async function run (){
 
         const partCollection = client.db('manufacturer-website').collection('parts');
 
-
+        const reviewCollection = client.db('manufacturer-website').collection('reviews');
         const userCollection = client.db('manufacturer-website').collection('users'); 
 
         const bookingCollection = client.db('manufacturer-website').collection('bookings');
@@ -60,7 +60,7 @@ app.get('/part',async(req, res)=>{
   res.send(parts) ;
 });
 
-app.get('/part',async(req, res)=>{
+app.post('/part',async(req, res)=>{
   const newPart = req.body;
   const result = await partCollection.insertOne(newPart);
   res.send(result) ;
@@ -74,6 +74,14 @@ app.get('/part/:id',async(req,res)=>{
   const part = await partCollection.findOne(query);
   res.send(part);
 
+});
+
+
+ app.delete('/part/:id', async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: ObjectId(id) };
+  const result = await partCollection.deleteOne(query);
+  res.send(result);
 });
 
 // bookings post
@@ -117,7 +125,18 @@ app.put('/user/:email', async (req, res) => {
   res.send({ result, token });
 });
 
-    
+   // Review
+   app.post('/review', async (req, res) => {
+    const newReview = req.body;
+    const result = await reviewCollection.insertOne(newReview);
+    res.send(result);
+});
+
+
+app.get('/review', async (req, res) => {
+    const reviews = await reviewCollection.find().toArray();
+    res.send(reviews);
+});  
         
     }
 
